@@ -1,5 +1,5 @@
 # Imports
-import json, time, re, discord
+import json, time, re, discord, asyncio
 from discord.errors import Forbidden
 from discord.errors import HTTPException
 
@@ -29,14 +29,14 @@ async def on_message(message):
         try:
             msgLen = await client.purge_from(chan, limit=delLimit)
             botMsg = await client.send_message(chan, 'Successfully deleted {} message(s)'.format(len(msgLen) - 1))
-            time.sleep(3)
+            await asyncio.sleep(3)
         except Forbidden:
             botMsg = await client.send_message(chan, "Insufficient permission to delete messages. Please contact the admins/owners of this server.")
-            time.sleep(5)
+            await asyncio.sleep(5)
         except HTTPException:
             await client.delete_message(message)
             botMsg = await client.send_message(chan, "Unable to delete messages more than 14 days ago. **TODO: Please implement this in future.**")
-            time.sleep(5)
+            await asyncio.sleep(5)
             
         # Cleanup bot message
         await client.delete_message(botMsg)
