@@ -1,5 +1,5 @@
 # Imports
-import json, time, re, discord, asyncio
+import json, re, discord, asyncio
 from discord.errors import Forbidden
 from discord.errors import HTTPException
 
