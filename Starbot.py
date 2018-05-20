@@ -2,44 +2,37 @@
 import json, re, discord, asyncio
 from discord.errors import Forbidden
 from discord.errors import HTTPException
+from discord.ext import commands
 
-client = discord.Client()
+bot = commands.Bot(command_prefix='!')
 
-# Print success details
-@client.event
+@bot.event
 async def on_ready():
     print('Bot Logged In\n---------------')
-    print('Bot Name: %s \nBot ID: %s' % (client.user.name, client.user.id))
+    print('Bot Name: %s \nBot ID: %s' % (bot.user.name, bot.user.id))
     print('---------------')
 
-@client.event
-async def on_message(message):
-    chan = message.channel
+@bot.command()
+async def hi(ctx):
+    await ctx.send('Hello there, %s !' % ctx.author.mention)
 
-    if message.content.startswith('!hi'):
-        await client.send_message(chan, 'Hi there, %s !' % message.author.mention)
-    elif message.content.startswith('!del'):
-        # Retrieve delete limits from message
-        if (re.match('^!del \d+$', message.content)):
-            delLimit = int(message.content[5:]) + 1
-        else:
-            delLimit = 150
+@bot.command()
+async def delt(ctx, delLimit: int = 100):
+    # Executes delete message
+    try:
+        msgLen = await ctx.channel.purge(limit=delLimit + 1)
+        botMsg = await ctx.send('Successfully deleted {} message(s)'.format(len(msgLen) - 1))
+        await asyncio.sleep(3)
+    except Forbidden:
+        botMsg = await ctx.send( "Insufficient permission to delete messages. Please contact the admins/owners of this server.")
+        await asyncio.sleep(5)
+    except HTTPException:
+        await ctx.message.delete()
+        botMsg = await ctx.send( "Unable to delete messages more than 14 days ago. **TODO: Please implement this in future.**")
+        await asyncio.sleep(5)
 
-        # Executes delete message
-        try:
-            msgLen = await client.purge_from(chan, limit=delLimit)
-            botMsg = await client.send_message(chan, 'Successfully deleted {} message(s)'.format(len(msgLen) - 1))
-            await asyncio.sleep(3)
-        except Forbidden:
-            botMsg = await client.send_message(chan, "Insufficient permission to delete messages. Please contact the admins/owners of this server.")
-            await asyncio.sleep(5)
-        except HTTPException:
-            await client.delete_message(message)
-            botMsg = await client.send_message(chan, "Unable to delete messages more than 14 days ago. **TODO: Please implement this in future.**")
-            await asyncio.sleep(5)
-            
-        # Cleanup bot message
-        await client.delete_message(botMsg)
+    # Cleanup bot message
+    await botMsg.delete()
 
 # Load JSON configuration file
 def load_json():
@@ -48,4 +41,4 @@ def load_json():
     return conf
 
 # Run bot
-client.run(load_json()['token'])
+bot.run(load_json()['token'])
