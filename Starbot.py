@@ -1,10 +1,17 @@
 # Imports
 import json, re, discord, asyncio
 from discord.errors import Forbidden
-from discord.errors import HTTPException
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix='!')
+
+
+# Load JSON configuration file
+def load_json():
+    with open('config.json') as confData:
+        conf = json.load(confData)
+    return conf
+
 
 @bot.event
 async def on_ready():
@@ -12,9 +19,11 @@ async def on_ready():
     print('Bot Name: %s \nBot ID: %s' % (bot.user.name, bot.user.id))
     print('---------------')
 
+
 @bot.command()
 async def hi(ctx):
     await ctx.send('Hello there, %s !' % ctx.author.mention)
+
 
 @bot.command()
 async def delt(ctx, delLimit: int = 100):
@@ -24,21 +33,21 @@ async def delt(ctx, delLimit: int = 100):
         botMsg = await ctx.send('Successfully deleted {} message(s)'.format(len(msgLen) - 1))
         await asyncio.sleep(3)
     except Forbidden:
-        botMsg = await ctx.send( "Insufficient permission to delete messages. Please contact the admins/owners of this server.")
-        await asyncio.sleep(5)
-    except HTTPException:
-        await ctx.message.delete()
-        botMsg = await ctx.send( "Unable to delete messages more than 14 days ago. **TODO: Please implement this in future.**")
+        botMsg = await ctx.send("Insufficient permission to delete messages. Please contact the admins/owners of this server.")
         await asyncio.sleep(5)
 
     # Cleanup bot message
     await botMsg.delete()
 
-# Load JSON configuration file
-def load_json():
-    with open('config.json') as confData:
-        conf = json.load(confData)
-    return conf
+
+@bot.command()
+async def quit(ctx):
+    author = load_json()['author']
+
+    if (str(ctx.author) == author):
+        await ctx.send('Bot is shutting down...')
+        await bot.logout()
+        exit(0)
 
 # Run bot
 bot.run(load_json()['token'])
