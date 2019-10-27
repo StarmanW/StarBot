@@ -2,7 +2,7 @@
 This is a test discord bot written in python using [discord.py by Rapptz](https://github.com/Rapptz/discord.py).
 
 # Requirements
-* Python 3.4.2+
+* Python 3.5.3 or higher is required
 * discord.py
 * pip
 
