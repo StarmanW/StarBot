@@ -1,4 +1,4 @@
 .idea
 .idea/*
-Run.bat
+*pycache*
 config.json

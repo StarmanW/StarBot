@@ -1,0 +1,11 @@
+{
+    "events_directory": "./events",
+    "extensions_directory": "./extensions",
+    "prefix": "!",
+    "token": "token_here",
+    "bot_owner": "discord_user_id_here",
+    "extensions": {
+        "utility": {},
+        "fun": {}
+    }
+}
